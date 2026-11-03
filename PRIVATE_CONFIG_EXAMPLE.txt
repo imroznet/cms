@@ -1,0 +1,8 @@
+Create ahmad-private/config.php OUTSIDE the web root, next to the staging directory:
+<?php
+putenv('AHMAD_DB_HOST=localhost');
+putenv('AHMAD_DB_NAME=YOUR_STAGING_DATABASE');
+putenv('AHMAD_DB_USER=YOUR_STAGING_USER');
+putenv('AHMAD_DB_PASSWORD=YOUR_NEW_PASSWORD');
+
+Do not reuse the database password from the uploaded archive. Restrict the private directory to the hosting account owner.

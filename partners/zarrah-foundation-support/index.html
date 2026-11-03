@@ -1,0 +1,723 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Supporting Zarrah Foundation - AHMAD SOLUTION LTD</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"><style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 100;
+        }
+
+        .header-top {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+
+        .header-top .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .contact-info a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .social-links a i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            line-height: 1;
+        }
+
+        .main-header {
+            padding: 20px 0;
+        }
+
+        .main-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            max-height: 50px;
+            margin-right: 10px;
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Navigation */
+        .main-nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .main-nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 5px 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .main-nav a:hover, .main-nav a.active {
+            color: #007bff;
+        }
+
+        .main-nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #007bff;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .header-top .container {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .main-nav {
+                display: none;
+                width: 100%;
+            }
+
+            .main-nav.active {
+                display: block;
+            }
+
+            .main-nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .main-header .container {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Sections */
+        .section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background-color: #007bff;
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .service-card {
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: white;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-card i {
+            font-size: 48px;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .service-card h3 {
+            margin-bottom: 15px;
+        }
+
+        /* News Grid */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .news-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .news-card-content {
+            padding: 20px;
+        }
+
+        .news-date {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* Statistics */
+        .statistics {
+            background-color: #f8f9fa;
+            padding: 60px 0;
+        }
+
+        .statistics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+
+        .statistic {
+            padding: 20px;
+        }
+
+        .statistic i {
+            font-size: 36px;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .statistic .number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .statistic .title {
+            color: #6c757d;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        .form-group textarea {
+            height: 150px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+        }
+
+        .contact-info-item {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .contact-info-item i {
+            font-size: 20px;
+            color: #007bff;
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .contact-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    
+
+.page-header {
+    color: white;
+    padding: 80px 0;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.8;
+}
+
+.about-content h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.about-content ul {
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.about-content ul li {
+    margin-bottom: 10px;
+}
+
+
+/* Footer Styles */
+.site-footer {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.footer-top {
+    padding: 60px 0 40px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+}
+
+.footer-company h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.motto {
+    margin-bottom: 20px;
+    font-style: italic;
+    color: #ccc;
+}
+
+.footer-address {
+    display: flex;
+    margin-top: 15px;
+}
+
+.footer-address i {
+    margin-right: 10px;
+    margin-top: 5px;
+}
+
+.footer-links h4, .footer-contact h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.footer-links h4::after, .footer-contact h4::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background-color: #007bff;
+}
+
+.footer-links ul {
+    list-style: none;
+}
+
+.footer-links ul li {
+    margin-bottom: 10px;
+}
+
+.footer-links ul li a {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links ul li a:hover {
+    color: #007bff;
+}
+
+.footer-contact p {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.footer-contact i {
+    margin-right: 10px;
+    color: #007bff;
+}
+
+.footer-social {
+    margin-top: 20px;
+}
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.social-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: #fff;
+    transition: background-color 0.3s;
+    text-decoration: none; /* Remove underlines */
+    position: relative; /* Added for precise icon positioning */
+}
+
+.social-icons a i {
+    position: absolute; /* Position the icon absolutely */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Perfect centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.social-icons a:hover {
+    background-color: #007bff;
+    text-decoration: none;
+}
+
+/* Update the footer-bottom class */
+.footer-bottom {
+    background-color: #212529;
+    padding: 20px 0;
+    text-align: center;
+    width: 100%;
+}
+
+/* Make sure the container inside footer-bottom doesn't override the centering */
+.footer-bottom .container {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.footer-bottom p {
+    margin: 0;
+    font-size: 14px;
+    text-align: center; /* Triple ensure centering */
+    width: 100%; /* Ensure the paragraph takes full width */
+}
+
+/* Responsive Footer */
+@media screen and (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+<style>
+/* Zarrah support page additions */
+.support-intro { text-align:center; }
+.support-intro .eyebrow { color:#007bff; font-weight:600; text-transform:uppercase; letter-spacing:.08em; font-size:.85rem; margin-bottom:10px; }
+.support-intro h2 { margin-bottom:18px; }
+.support-grid { margin-top:40px; }
+.support-card { min-height:230px; }
+.support-card p { color:#555; line-height:1.7; }
+.support-statement { max-width:900px; margin:0 auto; padding:42px 35px; background:#f8f9fa; border-left:4px solid #007bff; line-height:1.85; }
+.support-statement h2 { margin-bottom:15px; }
+.organization-card { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:stretch; margin-top:40px; }
+.organization-panel { padding:35px; background:#fff; border-radius:5px; box-shadow:0 5px 15px rgba(0,0,0,.05); }
+.organization-panel h3 { margin-bottom:15px; }
+.organization-panel .label { color:#007bff; font-size:.85rem; font-weight:600; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+.organization-panel p { line-height:1.75; }
+.zarrah-panel { border-top:3px solid #0B592F; }
+.zarrah-panel .label { color:#0B592F; }
+.zarrah-mark { font-size:2rem; font-weight:700; color:#0B592F; margin-bottom:12px; }
+.support-cta { background-color:#007bff; color:white; text-align:center; }
+.support-cta .btn:hover { background-color:#f1f1f1; color:#0056b3; }
+@media(max-width:768px){ .organization-card{grid-template-columns:1fr;} .support-statement{padding:30px 22px;} }
+</style>
+</head><body><header>
+<div class="header-top">
+<div class="container">
+<div class="contact-info">
+<a href="mailto:info@ahmad.com.bd">
+<i class="fas fa-envelope"></i> info\@ahmad.com.bd                    </a>
+<a href="tel:+8801864477711">
+<i class="fas fa-phone"></i> +8801864477711                    </a>
+</div>
+<div class="social-links">
+<a href="https://facebook.com/ahmadsolution/" target="_blank">
+<i class="fab fa-facebook-f"></i>
+</a>
+<a href="https://www.youtube.com/@AHMADSOLUTIONLTD" target="_blank">
+<i class="fab fa-youtube"></i>
+</a>
+<a href="https://linkedin.com/company/ahmad-bd" target="_blank">
+<i class="fab fa-linkedin"></i>
+</a>
+</div>
+</div>
+</div>
+<div class="main-header">
+<div class="container">
+<div class="logo">
+<img alt="AHMAD SOLUTION LTD" src="https://ahmad.com.bd/assets/images/uploads/logo_1760852391.png"/>
+<div class="company-name">AHMAD SOLUTION LTD</div>
+</div>
+<button class="mobile-menu-toggle">
+<i class="fas fa-bars"></i>
+</button>
+<nav class="main-nav">
+<ul>
+<li><a class="" href="https://ahmad.com.bd/">Home</a></li>
+<li><a class="active" href="https://ahmad.com.bd/about">About</a></li>
+<li><a class="" href="https://ahmad.com.bd/services">Services</a></li>
+<li><a class="" href="https://ahmad.com.bd/team">Our Team</a></li>
+<li><a class="" href="https://ahmad.com.bd/news">News</a></li>
+<li><a class="" href="https://ahmad.com.bd/careers">Careers</a></li>
+<li><a href="https://blog.ahmad.com.bd/" target="_blank">Blog</a></li>
+<li><a class="" href="https://ahmad.com.bd/contact">Contact</a></li>
+</ul>
+</nav>
+</div>
+</div>
+</header>
+<section class="page-header" style="background: linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)), url('/assets/images/about-header.jpg') no-repeat center center/cover;">
+  <div class="container">
+    <h1>Supporting Zarrah Foundation</h1>
+    <p>Technology, resources, and commitment in support of meaningful community impact.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="about-content support-intro">
+      <div class="eyebrow">Our Social Commitment</div>
+      <h2>Business to Change</h2>
+      <p>AHMAD SOLUTION LTD believes that meaningful progress extends beyond business. As a company built around innovation, opportunity, and community development, we are proud to support Zarrah Foundation through our capabilities, resources, and technical expertise.</p>
+    </div>
+    <div class="services-grid support-grid">
+      <div class="service-card support-card"><i class="fas fa-laptop-code"></i><h3>Technology Support</h3><p>Supporting digital platforms, technology infrastructure, and practical solutions that strengthen organizational capacity.</p></div>
+      <div class="service-card support-card"><i class="fas fa-cogs"></i><h3>Technical Expertise</h3><p>Contributing technical knowledge and implementation support where our engineering and technology experience can create value.</p></div>
+      <div class="service-card support-card"><i class="fas fa-users"></i><h3>Community Development</h3><p>Supporting initiatives aligned with our belief in opportunity, empowerment, collaboration, and positive community development.</p></div>
+      <div class="service-card support-card"><i class="fas fa-hands-helping"></i><h3>Organizational Support</h3><p>Providing assistance that helps Zarrah Foundation improve its ability to organize, communicate, and deliver its initiatives.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="support-statement"><h2>Our Role</h2><p>Ahmad Solution Ltd. supports Zarrah Foundation as an independent organization. Our role is to contribute technical capabilities, resources, and organizational assistance where appropriate. The Foundation retains its own mission, governance, leadership, and independent activities.</p></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-title"><h2>Two Organizations, One Purpose</h2></div>
+    <div class="organization-card">
+      <div class="organization-panel"><div class="label">Supporting Organization</div><h3>AHMAD SOLUTION LTD</h3><p>Ahmad Solution Ltd. is a Bangladesh-based company founded with a vision to inspire change, create opportunities, and empower the youth of Bangladesh. Its activities include automation, substation equipment, food production, agro-processing, and advanced manufacturing.</p><p style="margin-top:15px;"><strong>Business to Change</strong></p></div>
+      <div class="organization-panel zarrah-panel"><div class="label">Supported Organization</div><div class="zarrah-mark">Zarrah Foundation</div><p>Zarrah Foundation is an independent social-impact organization working to create positive change and support people and communities through its initiatives.</p><p style="margin-top:15px;"><strong>Small Acts, Lasting Impact</strong></p><a href="https://zarrah.org/" class="btn" target="_blank" rel="noopener" style="margin-top:20px;">Visit Zarrah Foundation</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section support-cta"><div class="container"><h2>Building Change Beyond Business</h2><p>We believe that technology, entrepreneurship, and social responsibility can work together to create lasting impact.</p><a href="/contact" class="btn btn-secondary" style="background-color:white;color:#007bff;margin-top:20px;">Get In Touch</a></div></section>
+
+<footer class="site-footer">
+<div class="footer-top">
+<div class="container">
+<div class="footer-content">
+<div class="footer-company">
+<h3>AHMAD SOLUTION LTD</h3>
+<p class="motto">Business to Change</p>
+<div class="footer-address">
+<i class="fas fa-map-marker-alt"></i>
+<p>Sakhipur Municipality, Sakhipur-1950, Sakhipur, Tangail, Dhaka, Bangladesh</p>
+</div>
+</div>
+<div class="footer-links">
+<h4>Quick Links</h4>
+<ul>
+<li><a href="https://ahmad.com.bd/index">Home</a></li>
+<li><a href="https://ahmad.com.bd/about">About Us</a></li>
+<li><a href="https://ahmad.com.bd/services">Services</a></li>
+<li><a href="https://ahmad.com.bd/news">News</a></li>
+<li><a href="https://ahmad.com.bd/careers">Careers</a></li>
+<li><a href="https://blog.ahmad.com.bd/" target="_blank">Blog</a></li>
+<li><a href="https://ahmad.com.bd/contact">Contact Us</a></li>
+</ul>
+</div>
+<div class="footer-contact">
+<h4>Contact Us</h4>
+<p><i class="fas fa-phone"></i> +8801864477711</p>
+<p><i class="fas fa-envelope"></i> info@ahmad.com.bd</p>
+<div class="footer-social">
+<h4>Follow Us</h4>
+<div class="social-icons">
+<a href="https://facebook.com/ahmadsolution/" target="_blank">
+<i class="fab fa-facebook-f"></i>
+</a>
+<a href="https://www.youtube.com/@AHMADSOLUTIONLTD" target="_blank">
+<i class="fab fa-youtube"></i>
+</a>
+<a href="https://linkedin.com/company/ahmad-bd" target="_blank">
+<i class="fab fa-linkedin"></i>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer-bottom">
+<div class="container">
+<p>© 2026 AHMAD SOLUTION LTD. All Rights Reserved.</p>
+</div>
+</div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var toggle=document.querySelector('.mobile-menu-toggle');
+  var nav=document.querySelector('.main-nav');
+  if(toggle && nav){ toggle.addEventListener('click', function(){ nav.classList.toggle('active'); }); }
+});
+</script>
+</body></html>

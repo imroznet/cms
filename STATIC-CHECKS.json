@@ -1,0 +1,12 @@
+{
+  "checks": {
+    "backdoors_excluded": true,
+    "no_sql_or_logs": true,
+    "admin_bootstraps": true,
+    "pdo_fix": true,
+    "no_embedded_db_credentials": true,
+    "resumes_denied": true,
+    "confirmation_form_marker": true
+  },
+  "runtime_tests": "Not run: PHP and MySQL unavailable."
+}
