@@ -4,5 +4,7 @@ putenv('AHMAD_DB_HOST=localhost');
 putenv('AHMAD_DB_NAME=YOUR_STAGING_DATABASE');
 putenv('AHMAD_DB_USER=YOUR_STAGING_USER');
 putenv('AHMAD_DB_PASSWORD=YOUR_NEW_PASSWORD');
+putenv('AHMAD_RECAPTCHA_SITE_KEY=');
+putenv('AHMAD_RECAPTCHA_SECRET_KEY=');
 
 Do not reuse the database password from the uploaded archive. Restrict the private directory to the hosting account owner.
