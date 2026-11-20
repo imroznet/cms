@@ -40,23 +40,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $stmt->execute([$name, $email, $subject, $messageText]);
             
             if ($result) {
-                // Send email notification if admin email is set
-                if (!empty($settings['admin_email'])) {
-                    $adminEmail = $settings['admin_email'];
+                $adminEmail = $settings['admin_email'] ?? '';
+                if (!is_string($adminEmail) || $adminEmail === '') {
+                    $adminEmail = $settings['contact_email'] ?? '';
+                }
+                $delivered = false;
+                if (is_string($adminEmail) && $adminEmail !== '') {
                     $emailSubject = "New Contact Form Message: $subject";
                     $emailBody = "You have received a new message from your website contact form.\n\n";
                     $emailBody .= "Name: $name\n";
                     $emailBody .= "Email: $email\n";
                     $emailBody .= "Subject: $subject\n\n";
                     $emailBody .= "Message:\n$messageText\n";
-                    
                     $headers = "From: $email\r\n";
-                    
-                    mail($adminEmail, $emailSubject, $emailBody, $headers);
+                    $delivered = mail($adminEmail, $emailSubject, $emailBody, $headers);
                 }
-                
-                $message = "Thank you! Your message has been sent successfully.";
-                $messageType = "success";
+
+                if ($delivered) {
+                    $message = "Thank you! Your message has been sent successfully.";
+                    $messageType = "success";
+                } else {
+                    $message = "Your message was saved, but it could not be emailed. Please call or email the office directly.";
+                    $messageType = "error";
+                }
                 
                 // Reset form fields
                 $name = $email = $subject = $messageText = '';

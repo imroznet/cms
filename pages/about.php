@@ -4,8 +4,12 @@ if (!defined('INCLUDED')) {
     die('Direct access not permitted');
 }
 
-// Get statistics
-$statistics = getStatistics($conn);
+// Get statistics. A stored zero is not a company figure, so it stays off the page.
+$statistics = array_values(array_filter(getStatistics($conn), static function (array $stat): bool {
+    $numeric = preg_replace('/[^0-9.\-]/', '', (string) ($stat['value'] ?? ''));
+
+    return $numeric !== '' && (float) $numeric !== 0.0;
+}));
 
 // Get team members
 $team_members = [];
@@ -16,7 +20,7 @@ $team_members = $team_result ? $team_result->fetchAll(PDO::FETCH_ASSOC) : [];
 ?>
 
 <!-- Page Header -->
-<section class="page-header" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/images/about-header.jpg') no-repeat center center/cover;">
+<section class="page-header" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('<?php echo publicAsset('assets/images/about-header.jpg'); ?>') no-repeat center center/cover;">
     <div class="container">
         <h1>About Us</h1>
         <p>Learn more about our company</p>
@@ -30,31 +34,14 @@ $team_members = $team_result ? $team_result->fetchAll(PDO::FETCH_ASSOC) : [];
             <?php if (!empty($settings['about_content'])): ?>
                 <?php echo nl2br($settings['about_content']); ?>
             <?php else: ?>
-                <h2>Our Story</h2>
-                <p>Welcome to <?php echo $settings['company_name']; ?>. We are a young, dynamic company focused on innovation and excellence in the fields of automation, food industry, and agriculture.</p>
-                
-                <p>Founded with a vision to transform traditional business practices through technology and innovation, our company has been steadily growing and adapting to the changing market demands.</p>
-                
-                <h2>Our Mission</h2>
-                <p>Our mission is to provide cutting-edge solutions that help businesses automate processes, improve efficiency, and achieve sustainable growth. We are committed to delivering high-quality services that meet the unique needs of each client.</p>
-                
-                <h2>Our Vision</h2>
-                <p>We aim to become a leading provider of innovative solutions in the automation, food, and agricultural sectors. By leveraging the latest technologies and industry best practices, we strive to help businesses of all sizes – from startups to established enterprises – reach their full potential.</p>
-                
-                <h2>Our Values</h2>
-                <ul>
-                    <li><strong>Innovation:</strong> We continuously explore new ideas and technologies to deliver cutting-edge solutions.</li>
-                    <li><strong>Quality:</strong> We are committed to maintaining the highest standards in all our products and services.</li>
-                    <li><strong>Integrity:</strong> We conduct our business with honesty, transparency, and ethical practices.</li>
-                    <li><strong>Customer Focus:</strong> We prioritize understanding and meeting our clients' needs and expectations.</li>
-                    <li><strong>Collaboration:</strong> We believe in the power of teamwork and partnership to achieve mutual success.</li>
-                </ul>
+                <p>The company story is added from site administration.</p>
             <?php endif; ?>
         </div>
     </div>
 </section>
 
 <!-- Statistics Section -->
+<?php if (count($statistics) > 0): ?>
 <section class="statistics">
     <div class="container">
         <div class="statistics-grid">
@@ -77,7 +64,7 @@ $team_members = $team_result ? $team_result->fetchAll(PDO::FETCH_ASSOC) : [];
         </div>
     </div>
 </section>
-
+<?php endif; ?>
 
 <!-- Team Section -->
 <section class="section">

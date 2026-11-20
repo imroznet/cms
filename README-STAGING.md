@@ -31,6 +31,14 @@ The supplied export defines 13 tables including users, permissions, activity log
 - Contact and career form success/failure paths, email delivery, private resume storage/download policy.
 - About, nested news/career URLs, invalid IDs and pagination.
 
+## Public site maintenance and news
+
+The public front controller reads a flag file before it renders a page. The default path is `ahmad-private/public-site-maintenance` beside the document root, the same private directory as `config.php`. Set `AHMAD_MAINTENANCE_FILE` when the file lives somewhere else. A file whose contents are `1` makes every public page return HTTP 503 with the company name and a short maintenance message. Any other value, or a missing file, leaves the site visible. The admin scripts are separate entry points and do not read this flag.
+
+`deploy/upgrade-news-published.sql` adds `news.is_published` with default 1, so articles already on the site stay published. Import it once. Importing it again does not add the column a second time and does not change a later unpublished article. Until that column exists, the public pages show every article.
+
+This candidate is not deployed to ahmad.com.bd from this change. Take a full backup and get the owner's approval before replacing the live site.
+
 ## Still pending — not a full security sign-off
 Login rate limiting, comprehensive output escaping/rich-text sanitization, SMTP integration, durable private resume downloads, CSP policy, security audit of every authorization/data path, database migration checks, and full browser/runtime QA.
 

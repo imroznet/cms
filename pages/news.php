@@ -10,12 +10,13 @@ $perPage = 6;
 $offset = ($page - 1) * $perPage;
 
 // Get total number of news articles
-$stmt = $conn->query("SELECT COUNT(*) FROM news");
+$published = publishedNewsSql($conn);
+$stmt = $conn->query("SELECT COUNT(*) FROM news WHERE 1 = 1" . $published);
 $totalNews = $stmt->fetchColumn();
-$totalPages = ceil($totalNews / $perPage);
+$totalPages = (int) ceil($totalNews / $perPage);
 
 // Get news articles with pagination
-$stmt = $conn->prepare("SELECT * FROM news ORDER BY publish_date DESC LIMIT ? OFFSET ?");
+$stmt = $conn->prepare("SELECT * FROM news WHERE 1 = 1" . $published . " ORDER BY publish_date DESC, id DESC LIMIT ? OFFSET ?");
 $stmt->bindParam(1, $perPage, PDO::PARAM_INT);
 $stmt->bindParam(2, $offset, PDO::PARAM_INT);
 $stmt->execute();
@@ -23,7 +24,7 @@ $newsArticles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!-- Page Header -->
-<section class="page-header" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/images/news-header.jpg') no-repeat center center/cover;">
+<section class="page-header" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('<?php echo publicAsset('assets/images/news-header.jpg'); ?>') no-repeat center center/cover;">
     <div class="container">
         <h1>News & Updates</h1>
         <p>Stay informed about our latest developments</p>
@@ -38,14 +39,14 @@ $newsArticles = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php foreach ($newsArticles as $news): ?>
                     <div class="news-card">
                         <?php if (!empty($news['image'])): ?>
-                            <img src="assets/images/uploads/<?php echo $news['image']; ?>" alt="<?php echo $news['title']; ?>">
+                            <img src="<?php echo htmlspecialchars(publicAsset('assets/images/uploads/' . $news['image'])); ?>" alt="<?php echo htmlspecialchars($news['title']); ?>">
                         <?php else: ?>
-                            <img src="assets/images/news-placeholder.jpg" alt="News">
+                            <img src="<?php echo htmlspecialchars(publicAsset('assets/images/news-placeholder.jpg')); ?>" alt="News">
                         <?php endif; ?>
                         <div class="news-card-content">
                             <div class="news-date"><?php echo date('F j, Y', strtotime($news['publish_date'])); ?></div>
-                            <h3><?php echo $news['title']; ?></h3>
-                            <p><?php echo substr(strip_tags($news['content']), 0, 150) . '...'; ?></p>
+                            <h3><?php echo htmlspecialchars($news['title']); ?></h3>
+                            <p><?php echo htmlspecialchars(substr(strip_tags($news['content']), 0, 150)) . '...'; ?></p>
                             <a href="news-detail/<?php echo $news['id']; ?>" class="btn btn-secondary">Read More</a>
                         </div>
                     </div>
@@ -110,8 +111,10 @@ $newsArticles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 .news-card img {
     width: 100%;
-    height: 200px;
-    object-fit: cover;
+    height: 220px;
+    object-fit: contain;
+    object-position: center;
+    background: #f8f9fa;
 }
 
 .news-card-content {

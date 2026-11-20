@@ -8,7 +8,7 @@ if (!defined('INCLUDED')) {
 $newsId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // Get news article details
-$stmt = $conn->prepare("SELECT * FROM news WHERE id = ?");
+$stmt = $conn->prepare("SELECT * FROM news WHERE id = ?" . publishedNewsSql($conn));
 $stmt->execute([$newsId]);
 $news = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -31,7 +31,7 @@ if (!empty($news['created_by'])) {
 ?>
 
 <!-- Page Header -->
-<section class="page-header" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/images/news-header.jpg') no-repeat center center/cover;">
+<section class="page-header" style="background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('<?php echo publicAsset('assets/images/news-header.jpg'); ?>') no-repeat center center/cover;">
     <div class="container">
         <h1><?php echo $news['title']; ?></h1>
         <p><?php echo date('F j, Y', strtotime($news['publish_date'])); ?></p>
@@ -44,7 +44,7 @@ if (!empty($news['created_by'])) {
         <div class="news-detail" style="max-width: 800px; margin: 0 auto;">
             <?php if (!empty($news['image'])): ?>
                 <div class="news-image" style="margin-bottom: 30px;">
-                    <img src="assets/images/uploads/<?php echo $news['image']; ?>" alt="<?php echo $news['title']; ?>" style="width: 100%; border-radius: 5px;">
+                    <img src="<?php echo htmlspecialchars(publicAsset('assets/images/uploads/' . $news['image'])); ?>" alt="<?php echo htmlspecialchars($news['title']); ?>" style="width: 100%; height: auto; object-fit: contain; background: #f8f9fa; border-radius: 5px;">
                 </div>
             <?php endif; ?>
             

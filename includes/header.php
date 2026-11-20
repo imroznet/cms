@@ -258,8 +258,10 @@ $settings = getSiteSettings($conn);
         
         .news-card img {
             width: 100%;
-            height: 200px;
-            object-fit: cover;
+            height: 220px;
+            object-fit: contain;
+            object-position: center;
+            background: #f8f9fa;
         }
         
         .news-card-content {
@@ -421,7 +423,7 @@ $settings = getSiteSettings($conn);
             <div class="container">
                 <div class="logo">
                     <?php if (!empty($settings['logo_image'])): ?>
-                    <img src="assets/images/uploads/<?php echo htmlspecialchars($settings['logo_image']); ?>" alt="<?php echo htmlspecialchars($settings['company_name'] ?? 'Company Logo'); ?>">
+                    <img src="<?php echo htmlspecialchars(publicAsset('assets/images/uploads/' . $settings['logo_image'])); ?>" alt="<?php echo htmlspecialchars($settings['company_name'] ?? 'Company Logo'); ?>">
                     <?php endif; ?>
                     <div class="company-name"><?php echo htmlspecialchars($settings['company_name'] ?? 'Company Name'); ?></div>
                 </div>

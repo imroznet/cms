@@ -3,6 +3,15 @@
 define('INCLUDED', true);
 require_once 'config/db.php';
 require_once 'includes/functions.php';
+require_once 'includes/maintenance.php';
+
+if (publicSiteIsHidden()) {
+    $settings = getSiteSettings($conn);
+    http_response_code(503);
+    header('Retry-After: 3600');
+    include 'pages/maintenance.php';
+    exit;
+}
 
 // Get the requested page from URL or default to home
 $page = isset($_GET['page']) ? $_GET['page'] : '';

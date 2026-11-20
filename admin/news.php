@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
 require_once '../config/db.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -73,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['_confirm_action'])) {
     $title = trim($_POST['title'] ?? '');
     $content = trim($_POST['content'] ?? '');
     $publish_date = trim($_POST['publish_date'] ?? '');
+    $isPublished = isset($_POST['is_published']) && $_POST['is_published'] === '1' ? 1 : 0;
     
     // Validate form
     $errors = [];
@@ -122,7 +124,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['_confirm_action'])) {
             try {
                 if ($id > 0) {
                     // Update existing article
-                    if ($image) {
+                    if (newsHasPublishedFlag($conn) && $image) {
+                        $stmt = $conn->prepare("UPDATE news SET title = ?, content = ?, publish_date = ?, image = ?, is_published = ?, updated_at = NOW() WHERE id = ?");
+                        $result = $stmt->execute([$title, $content, $publish_date, $image, $isPublished, $id]);
+                    } elseif (newsHasPublishedFlag($conn)) {
+                        $stmt = $conn->prepare("UPDATE news SET title = ?, content = ?, publish_date = ?, is_published = ?, updated_at = NOW() WHERE id = ?");
+                        $result = $stmt->execute([$title, $content, $publish_date, $isPublished, $id]);
+                    } elseif ($image) {
                         $stmt = $conn->prepare("UPDATE news SET title = ?, content = ?, publish_date = ?, image = ?, updated_at = NOW() WHERE id = ?");
                         $result = $stmt->execute([$title, $content, $publish_date, $image, $id]);
                     } else {
@@ -140,8 +148,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['_confirm_action'])) {
                     }
                 } else {
                     // Add new article
-                    $stmt = $conn->prepare("INSERT INTO news (title, content, publish_date, image, created_by) VALUES (?, ?, ?, ?, ?)");
-                    $result = $stmt->execute([$title, $content, $publish_date, $image, $_SESSION['user_id']]);
+                    if (newsHasPublishedFlag($conn)) {
+                        $stmt = $conn->prepare("INSERT INTO news (title, content, publish_date, image, is_published, created_by) VALUES (?, ?, ?, ?, ?, ?)");
+                        $result = $stmt->execute([$title, $content, $publish_date, $image, $isPublished, $_SESSION['user_id']]);
+                    } else {
+                        $stmt = $conn->prepare("INSERT INTO news (title, content, publish_date, image, created_by) VALUES (?, ?, ?, ?, ?)");
+                        $result = $stmt->execute([$title, $content, $publish_date, $image, $_SESSION['user_id']]);
+                    }
                     
                     if ($result) {
                         $message = "News article added successfully";
@@ -253,6 +266,15 @@ include 'includes/header.php';
                     </div>
                     
                     <div class="form-group">
+                        <input type="hidden" name="is_published" value="0">
+                        <label class="checkbox-wrapper" for="is_published">
+                            <input type="checkbox" id="is_published" name="is_published" value="1" <?php echo ($action === 'edit' ? ((int) ($editArticle['is_published'] ?? 1) === 1) : true) ? 'checked' : ''; ?>>
+                            Published
+                        </label>
+                        <p class="note">An unpublished article stays off the public site.</p>
+                    </div>
+
+                    <div class="form-group">
                         <label for="content">Content *</label>
                         <textarea id="content" name="content" rows="15" required><?php echo $action === 'edit' ? htmlspecialchars($editArticle['content']) : ''; ?></textarea>
                         <p class="note">
@@ -279,6 +301,7 @@ include 'includes/header.php';
                                 <tr>
                                     <th>Title</th>
                                     <th>Publish Date</th>
+                                    <th>Status</th>
                                     <th>Author</th>
                                     <th>Actions</th>
                                 </tr>
@@ -288,6 +311,7 @@ include 'includes/header.php';
                                     <tr>
                                         <td><?php echo htmlspecialchars($article['title']); ?></td>
                                         <td><?php echo date('M j, Y', strtotime($article['publish_date'])); ?></td>
+                                        <td><?php echo ((int) ($article['is_published'] ?? 1) === 1) ? 'Published' : 'Unpublished'; ?></td>
                                         <td><?php echo htmlspecialchars($article['username'] ?? 'Unknown'); ?></td>
                                         <td class="action-buttons">
                                             <a href="?action=edit&id=<?php echo $article['id']; ?>" title="Edit">

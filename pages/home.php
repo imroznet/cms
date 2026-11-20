@@ -56,21 +56,7 @@ $services = getServices($conn, 3);
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <div class="service-card">
-                    <i class="fas fa-cog"></i>
-                    <h3>Service 1</h3>
-                    <p>Description of service 1 goes here. This is a placeholder until you add services in the admin panel.</p>
-                </div>
-                <div class="service-card">
-                    <i class="fas fa-chart-line"></i>
-                    <h3>Service 2</h3>
-                    <p>Description of service 2 goes here. This is a placeholder until you add services in the admin panel.</p>
-                </div>
-                <div class="service-card">
-                    <i class="fas fa-users"></i>
-                    <h3>Service 3</h3>
-                    <p>Description of service 3 goes here. This is a placeholder until you add services in the admin panel.</p>
-                </div>
+                <p>Services are added from the site administration. None are published yet.</p>
             <?php endif; ?>
         </div>
         
@@ -82,7 +68,11 @@ $services = getServices($conn, 3);
 
 <!-- Statistics Section -->
 <?php
-$statistics = getStatistics($conn);
+$statistics = array_values(array_filter(getStatistics($conn), static function (array $stat): bool {
+    $numeric = preg_replace('/[^0-9.\-]/', '', (string) ($stat['value'] ?? ''));
+
+    return $numeric !== '' && (float) $numeric !== 0.0;
+}));
 if (count($statistics) > 0):
 ?>
 <section class="statistics">
@@ -104,6 +94,43 @@ if (count($statistics) > 0):
                     <div class="title"><?php echo htmlspecialchars($stat['title']); ?></div>
                 </div>
             <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php
+$latestNews = [];
+try {
+    $newsSql = "SELECT * FROM news WHERE 1 = 1" . publishedNewsSql($conn) . " ORDER BY publish_date DESC, id DESC LIMIT 3";
+    $latestNews = $conn->query($newsSql)->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $latestNews = [];
+}
+if (count($latestNews) > 0):
+?>
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>News</h2>
+        </div>
+        <div class="news-grid">
+            <?php foreach ($latestNews as $news): ?>
+                <article class="news-card">
+                    <?php if (!empty($news['image'])): ?>
+                        <img src="<?php echo htmlspecialchars(publicAsset('assets/images/uploads/' . $news['image'])); ?>" alt="<?php echo htmlspecialchars($news['title']); ?>">
+                    <?php endif; ?>
+                    <div class="news-card-content">
+                        <div class="news-date"><?php echo date('F j, Y', strtotime($news['publish_date'])); ?></div>
+                        <h3><?php echo htmlspecialchars($news['title']); ?></h3>
+                        <p><?php echo htmlspecialchars(substr(strip_tags($news['content']), 0, 150)); ?>...</p>
+                        <a href="news-detail/<?php echo (int) $news['id']; ?>" class="btn btn-secondary">Read more</a>
+                    </div>
+                </article>
+            <?php endforeach; ?>
+        </div>
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="news" class="btn">All news</a>
         </div>
     </div>
 </section>
