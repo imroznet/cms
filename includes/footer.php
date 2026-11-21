@@ -26,6 +26,7 @@ if (!defined('INCLUDED')) {
     <ul>
         <li><a href="index">Home</a></li>
         <li><a href="about">About Us</a></li>
+        <li><a href="documents">Documents</a></li>
         <li><a href="services">Services</a></li>
         <li><a href="news">News</a></li>
         <li><a href="careers">Careers</a></li>
