@@ -101,6 +101,65 @@ function newsHasPublishedFlag(PDO $conn): bool
     return $known;
 }
 
+function siteHasColumn(PDO $conn, string $column): bool
+{
+    static $columns = null;
+
+    if (!preg_match('/^[a-z_]+$/', $column)) {
+        return false;
+    }
+
+    if ($columns === null) {
+        $columns = [];
+
+        try {
+            foreach ($conn->query('SHOW COLUMNS FROM site_settings') as $row) {
+                if (isset($row['Field']) && is_string($row['Field'])) {
+                    $columns[$row['Field']] = true;
+                }
+            }
+        } catch (PDOException $e) {
+            $columns = [];
+        }
+    }
+
+    return isset($columns[$column]);
+}
+
+/**
+ * Registered and corporate offices, or the older single address when neither is set.
+ *
+ * @param array<string, mixed> $settings
+ * @return list<array{label: string, text: string}>
+ */
+function officeAddressBlocks(array $settings): array
+{
+    $registered = trim((string) ($settings['registered_office_address'] ?? ''));
+    $corporate = trim((string) ($settings['corporate_office_address'] ?? ''));
+
+    if ($registered !== '' || $corporate !== '') {
+        $blocks = [];
+
+        if ($registered !== '') {
+            $blocks[] = ['label' => 'Registered Office:', 'text' => $registered];
+        }
+
+        if ($corporate !== '') {
+            $blocks[] = ['label' => 'Corporate Office:', 'text' => $corporate];
+        }
+
+        return $blocks;
+    }
+
+    $fallback = trim((string) ($settings['address'] ?? ''));
+
+    if ($fallback === '') {
+        return [];
+    }
+
+    return [['label' => '', 'text' => $fallback]];
+}
+
 function publishedNewsSql(PDO $conn, string $alias = ''): string
 {
     if (!newsHasPublishedFlag($conn)) {
