@@ -13,9 +13,7 @@ $officePhone = (isset($settings['contact_phone']) && is_string($settings['contac
 $officeEmail = (isset($settings['contact_email']) && is_string($settings['contact_email']) && $settings['contact_email'] !== '')
     ? $settings['contact_email']
     : 'info@ahmad.com.bd';
-$officeAddress = (isset($settings['address']) && is_string($settings['address']) && $settings['address'] !== '')
-    ? $settings['address']
-    : 'Sakhipur Municipality, Sakhipur-1950, Sakhipur, Tangail, Dhaka, Bangladesh';
+$officeBlocks = officeAddressBlocks($settings);
 $formEnabled = contactFormEnabled();
 $recaptchaOn = recaptchaRequired();
 $recaptcha = recaptchaKeys();
@@ -125,15 +123,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h2>Contact Information</h2>
             <p>We're here to help! Reach out to us with any questions or inquiries.</p>
             
-            <?php if (!empty($settings['address'])): ?>
+            <?php foreach ($officeBlocks as $office): ?>
             <div class="contact-info-item">
                 <i class="fas fa-map-marker-alt"></i>
                 <div>
-                    <h4>Our Address</h4>
-                    <p><?php echo nl2br(htmlspecialchars($settings['address'])); ?></p>
+                    <h4><?php echo $office['label'] !== '' ? htmlspecialchars($office['label']) : 'Our Address'; ?></h4>
+                    <p><?php echo nl2br(htmlspecialchars($office['text'])); ?></p>
                 </div>
             </div>
-            <?php endif; ?>
+            <?php endforeach; ?>
             
             <?php if (!empty($settings['contact_email'])): ?>
             <div class="contact-info-item">
@@ -181,13 +179,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if (!$showForm): ?>
                 <h2>Send Us a Message</h2>
                 <p class="form-unavailable">The form is currently unavailable.</p>
+                <?php foreach ($officeBlocks as $office): ?>
                 <div class="contact-info-item">
                     <i class="fas fa-map-marker-alt"></i>
                     <div>
-                        <h4>Our Address</h4>
-                        <p><?php echo nl2br(htmlspecialchars($officeAddress)); ?></p>
+                        <h4><?php echo $office['label'] !== '' ? htmlspecialchars($office['label']) : 'Our Address'; ?></h4>
+                        <p><?php echo nl2br(htmlspecialchars($office['text'])); ?></p>
                     </div>
                 </div>
+                <?php endforeach; ?>
                 <div class="contact-info-item">
                     <i class="fas fa-envelope"></i>
                     <div>

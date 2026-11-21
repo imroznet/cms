@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/security.php';
 require_once '../config/db.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -147,6 +148,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['_confirm_action'])) {
     } elseif ($formType === 'contact_settings') {
         // Process contact settings form
         $address = trim($_POST['address'] ?? '');
+        $registeredOffice = trim($_POST['registered_office_address'] ?? '');
+        $corporateOffice = trim($_POST['corporate_office_address'] ?? '');
         $contact_email = trim($_POST['contact_email'] ?? '');
         $contact_phone = trim($_POST['contact_phone'] ?? '');
         $map_embed_url = trim($_POST['map_embed_url'] ?? '');
@@ -164,25 +167,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['_confirm_action'])) {
         
         if (empty($errors)) {
             try {
-                $stmt = $conn->prepare("
-                    UPDATE site_settings SET
-                    address = ?,
-                    contact_email = ?,
-                    contact_phone = ?,
-                    map_embed_url = ?,
-                    map_latitude = ?,
-                    map_longitude = ?
-                    WHERE id = 1
-                ");
-                
-                $result = $stmt->execute([
-                    $address,
-                    $contact_email,
-                    $contact_phone,
-                    $map_embed_url,
-                    $map_latitude,
-                    $map_longitude
-                ]);
+                $officeColumns = siteHasColumn($conn, 'registered_office_address') && siteHasColumn($conn, 'corporate_office_address');
+                if ($officeColumns) {
+                    $stmt = $conn->prepare("
+                        UPDATE site_settings SET
+                        address = ?,
+                        registered_office_address = ?,
+                        corporate_office_address = ?,
+                        contact_email = ?,
+                        contact_phone = ?,
+                        map_embed_url = ?,
+                        map_latitude = ?,
+                        map_longitude = ?
+                        WHERE id = 1
+                    ");
+                    $result = $stmt->execute([
+                        $address,
+                        $registeredOffice === '' ? null : $registeredOffice,
+                        $corporateOffice === '' ? null : $corporateOffice,
+                        $contact_email,
+                        $contact_phone,
+                        $map_embed_url,
+                        $map_latitude,
+                        $map_longitude
+                    ]);
+                } else {
+                    $stmt = $conn->prepare("
+                        UPDATE site_settings SET
+                        address = ?,
+                        contact_email = ?,
+                        contact_phone = ?,
+                        map_embed_url = ?,
+                        map_latitude = ?,
+                        map_longitude = ?
+                        WHERE id = 1
+                    ");
+                    $result = $stmt->execute([
+                        $address,
+                        $contact_email,
+                        $contact_phone,
+                        $map_embed_url,
+                        $map_latitude,
+                        $map_longitude
+                    ]);
+                }
                 
                 if ($result) {
                     $message = "Contact information updated successfully!";
@@ -435,7 +463,23 @@ include 'includes/header.php';
                     <div class="form-group">
                         <label for="address">Company Address</label>
                         <textarea id="address" name="address" rows="3"><?php echo htmlspecialchars($settings['address'] ?? ''); ?></textarea>
+                        <p class="note">Used on the public site only when both offices below are blank.</p>
                     </div>
+
+                    <?php if (siteHasColumn($conn, 'registered_office_address') && siteHasColumn($conn, 'corporate_office_address')): ?>
+                    <div class="form-group">
+                        <label for="registered_office_address">Registered Office</label>
+                        <textarea id="registered_office_address" name="registered_office_address" rows="3"><?php echo htmlspecialchars($settings['registered_office_address'] ?? ''); ?></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="corporate_office_address">Corporate Office</label>
+                        <textarea id="corporate_office_address" name="corporate_office_address" rows="3"><?php echo htmlspecialchars($settings['corporate_office_address'] ?? ''); ?></textarea>
+                        <p class="note">Leave an office blank until its address is entered. Nothing is filled in for you.</p>
+                    </div>
+                    <?php else: ?>
+                    <p class="note">Import deploy/upgrade-company-addresses.sql before editing the registered and corporate offices.</p>
+                    <?php endif; ?>
                     
                     <div class="form-group">
                         <label for="contact_email">Contact Email *</label>

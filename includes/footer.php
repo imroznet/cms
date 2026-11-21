@@ -13,12 +13,12 @@ if (!defined('INCLUDED')) {
                     <?php if (!empty($settings['motto'])): ?>
                     <p class="motto"><?php echo htmlspecialchars($settings['motto']); ?></p>
                     <?php endif; ?>
-                    <?php if (!empty($settings['address'])): ?>
+                    <?php foreach (officeAddressBlocks($settings) as $office): ?>
                     <div class="footer-address">
                         <i class="fas fa-map-marker-alt"></i>
-                        <p><?php echo nl2br(htmlspecialchars($settings['address'])); ?></p>
+                        <p><?php if ($office['label'] !== ''): ?><strong><?php echo htmlspecialchars($office['label']); ?></strong><br><?php endif; ?><?php echo nl2br(htmlspecialchars($office['text'])); ?></p>
                     </div>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
                 </div>
                 
                 <div class="footer-links">
@@ -26,10 +26,10 @@ if (!defined('INCLUDED')) {
     <ul>
         <li><a href="index">Home</a></li>
         <li><a href="about">About Us</a></li>
+        <li><a href="documents">Documents</a></li>
         <li><a href="services">Services</a></li>
         <li><a href="news">News</a></li>
         <li><a href="careers">Careers</a></li>
-        <li><a href="https://blog.ahmad.com.bd" target="_blank">Blog</a></li>
         <li><a href="contact">Contact Us</a></li>
     </ul>
                 </div>

@@ -66,6 +66,30 @@ $team_members = $team_result ? $team_result->fetchAll(PDO::FETCH_ASSOC) : [];
 </section>
 <?php endif; ?>
 
+<?php $documents = getCompanyDocuments($conn, true); ?>
+<?php if ($documents !== []): ?>
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Documentation</h2>
+        </div>
+        <?php include __DIR__ . '/../includes/company-documents.php'; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php $achievements = getAchievements($conn, true); ?>
+<?php if ($achievements !== []): ?>
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Achievements</h2>
+        </div>
+        <?php include __DIR__ . '/../includes/achievements.php'; ?>
+    </div>
+</section>
+<?php endif; ?>
+
 <!-- Team Section -->
 <section class="section">
     <div class="container">

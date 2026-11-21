@@ -38,6 +38,7 @@ $allowed_pages = [
     'careers' => ['file' => 'pages/careers.php', 'title' => 'Careers'],
     'career-detail' => ['file' => 'pages/career-detail.php', 'title' => 'Career Details'],
     'contact' => ['file' => 'pages/contact.php', 'title' => 'Contact Us'],
+    'documents' => ['file' => 'pages/documents.php', 'title' => 'Documents'],
 ];
 
 // Check if requested page exists

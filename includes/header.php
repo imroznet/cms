@@ -440,7 +440,6 @@ $settings = getSiteSettings($conn);
         <li><a href="team" class="<?php echo $currentPage === 'team' ? 'active' : ''; ?>">Our Team</a></li>
         <li><a href="news" class="<?php echo $currentPage === 'news' ? 'active' : ''; ?>">News</a></li>
         <li><a href="careers" class="<?php echo $currentPage === 'careers' ? 'active' : ''; ?>">Careers</a></li>
-        <li><a href="https://blog.ahmad.com.bd" target="_blank">Blog</a></li>
         <li><a href="contact" class="<?php echo $currentPage === 'contact' ? 'active' : ''; ?>">Contact</a></li>
     </ul>
 </nav>
