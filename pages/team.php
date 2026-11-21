@@ -29,7 +29,7 @@ $teamMembers = getTeamMembers($conn);
                 <div class="team-member">
                     <div class="team-member-image">
                         <?php if ($member['image'] && file_exists('assets/images/team/' . $member['image'])): ?>
-                            <img src="assets/images/team/<?php echo htmlspecialchars($member['image']); ?>" alt="<?php echo htmlspecialchars($member['name']); ?>" class="circular-image">
+                            <img src="<?php echo publicAsset('assets/images/team/' . $member['image']); ?>" alt="<?php echo htmlspecialchars($member['name']); ?>" class="circular-image">
                         <?php else: ?>
                             <img src="assets/images/team-placeholder.jpg" alt="<?php echo htmlspecialchars($member['name']); ?>" class="circular-image">
                         <?php endif; ?>

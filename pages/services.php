@@ -33,42 +33,7 @@ $services = getServices($conn);
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <!-- Default services if none in database -->
-                <div class="service-card">
-                    <i class="fas fa-robot"></i>
-                    <h3>Business Automation</h3>
-                    <p>We provide comprehensive automation solutions tailored to your business needs. Our expertise includes process automation, workflow optimization, and custom software development to streamline operations and increase productivity.</p>
-                </div>
-                
-                <div class="service-card">
-                    <i class="fas fa-industry"></i>
-                    <h3>Industrial Solutions</h3>
-                    <p>Our industrial solutions help manufacturing businesses optimize production processes, reduce waste, and improve quality control. We implement modern technologies to enhance operational efficiency and reduce costs.</p>
-                </div>
-                
-                <div class="service-card">
-                    <i class="fas fa-utensils"></i>
-                    <h3>Food Industry Innovations</h3>
-                    <p>We specialize in innovative solutions for the food industry, including processing technology, packaging solutions, and quality control systems. Our services help food businesses maintain high standards while increasing production capacity.</p>
-                </div>
-                
-                <div class="service-card">
-                    <i class="fas fa-seedling"></i>
-                    <h3>Agricultural Technology</h3>
-                    <p>Our agricultural technology solutions aim to improve farm productivity and sustainability. From smart farming systems to crop monitoring technology, we help agricultural businesses embrace modern practices for better yields.</p>
-                </div>
-                
-                <div class="service-card">
-                    <i class="fas fa-chart-line"></i>
-                    <h3>Business Consulting</h3>
-                    <p>Our experienced consultants provide strategic advice to help businesses identify opportunities for growth and improvement. We offer data-driven insights and practical recommendations for achieving your business goals.</p>
-                </div>
-                
-                <div class="service-card">
-                    <i class="fas fa-project-diagram"></i>
-                    <h3>Project Management</h3>
-                    <p>We offer comprehensive project management services to ensure your initiatives are completed on time, within budget, and according to specifications. Our methodical approach minimizes risks and maximizes outcomes.</p>
-                </div>
+                <p>Services are added from the site administration. None are published yet.</p>
             <?php endif; ?>
         </div>
     </div>

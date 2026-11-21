@@ -7,13 +7,34 @@ if (!defined('INCLUDED')) {
 // Process contact form submission
 $message = '';
 $messageType = '';
+$officePhone = (isset($settings['contact_phone']) && is_string($settings['contact_phone']) && $settings['contact_phone'] !== '')
+    ? $settings['contact_phone']
+    : '+8801864477711';
+$officeEmail = (isset($settings['contact_email']) && is_string($settings['contact_email']) && $settings['contact_email'] !== '')
+    ? $settings['contact_email']
+    : 'info@ahmad.com.bd';
+$officeAddress = (isset($settings['address']) && is_string($settings['address']) && $settings['address'] !== '')
+    ? $settings['address']
+    : 'Sakhipur Municipality, Sakhipur-1950, Sakhipur, Tangail, Dhaka, Bangladesh';
+$formEnabled = contactFormEnabled();
+$recaptchaOn = recaptchaRequired();
+$recaptcha = recaptchaKeys();
+$recaptchaReady = $recaptcha['site'] !== '' && $recaptcha['secret'] !== '';
+$showForm = $formEnabled && (!$recaptchaOn || $recaptchaReady);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = sanitize($_POST['name'] ?? '');
     $email = sanitize($_POST['email'] ?? '');
     $subject = sanitize($_POST['subject'] ?? '');
     $messageText = sanitize($_POST['message'] ?? '');
-    
+
+    if (!$formEnabled || ($recaptchaOn && !$recaptchaReady)) {
+        $message = 'The form is currently unavailable. Please call or email the office.';
+        $messageType = 'error';
+    } elseif ($recaptchaOn && !recaptchaVerified((string) ($_POST['g-recaptcha-response'] ?? ''), $recaptcha['secret'])) {
+        $message = 'Please complete the verification and try again';
+        $messageType = 'error';
+    } else {
     // Validate form
     $errors = [];
     
@@ -40,23 +61,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result = $stmt->execute([$name, $email, $subject, $messageText]);
             
             if ($result) {
-                // Send email notification if admin email is set
-                if (!empty($settings['admin_email'])) {
-                    $adminEmail = $settings['admin_email'];
+                $adminEmail = $settings['admin_email'] ?? '';
+                if (!is_string($adminEmail) || $adminEmail === '') {
+                    $adminEmail = $settings['contact_email'] ?? '';
+                }
+                $delivered = false;
+                if (is_string($adminEmail) && $adminEmail !== '') {
                     $emailSubject = "New Contact Form Message: $subject";
                     $emailBody = "You have received a new message from your website contact form.\n\n";
                     $emailBody .= "Name: $name\n";
                     $emailBody .= "Email: $email\n";
                     $emailBody .= "Subject: $subject\n\n";
                     $emailBody .= "Message:\n$messageText\n";
-                    
                     $headers = "From: $email\r\n";
-                    
-                    mail($adminEmail, $emailSubject, $emailBody, $headers);
+                    $delivered = mail($adminEmail, $emailSubject, $emailBody, $headers);
                 }
-                
-                $message = "Thank you! Your message has been sent successfully.";
-                $messageType = "success";
+
+                if ($delivered) {
+                    $message = "Thank you! Your message has been sent successfully.";
+                    $messageType = "success";
+                } else {
+                    $message = "Your message was saved, but it could not be emailed. Please call or email the office directly.";
+                    $messageType = "error";
+                }
                 
                 // Reset form fields
                 $name = $email = $subject = $messageText = '';
@@ -71,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $message = "Please correct the following errors: <ul><li>" . implode("</li><li>", $errors) . "</li></ul>";
         $messageType = "error";
+    }
     }
 }
 ?>
@@ -150,6 +178,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <!-- Contact Form Below -->
         <div class="contact-form-container">
+            <?php if (!$showForm): ?>
+                <h2>Send Us a Message</h2>
+                <p class="form-unavailable">The form is currently unavailable.</p>
+                <div class="contact-info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <h4>Our Address</h4>
+                        <p><?php echo nl2br(htmlspecialchars($officeAddress)); ?></p>
+                    </div>
+                </div>
+                <div class="contact-info-item">
+                    <i class="fas fa-envelope"></i>
+                    <div>
+                        <h4>Email Us</h4>
+                        <p><a href="mailto:<?php echo htmlspecialchars($officeEmail); ?>" class="contact-link"><?php echo htmlspecialchars($officeEmail); ?></a></p>
+                    </div>
+                </div>
+                <div class="contact-info-item">
+                    <i class="fas fa-phone-alt"></i>
+                    <div>
+                        <h4>Call Us</h4>
+                        <p><a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $officePhone); ?>" class="contact-link"><?php echo htmlspecialchars($officePhone); ?></a></p>
+                    </div>
+                </div>
+            <?php else: ?>
             <h2>Send Us a Message</h2>
             <form method="post" action="">
                 <div class="form-group">
@@ -172,8 +225,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <textarea id="message" name="message" rows="6" required><?php echo htmlspecialchars($messageText ?? ''); ?></textarea>
                 </div>
                 
+                <?php if ($recaptchaOn && $recaptchaReady): ?>
+                <div class="form-group">
+                    <div class="g-recaptcha" data-sitekey="<?php echo htmlspecialchars($recaptcha['site']); ?>"></div>
+                </div>
+                <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                <?php endif; ?>
+
                 <button type="submit" class="btn btn-primary">Send Message</button>
             </form>
+            <?php endif; ?>
         </div>
         
         <!-- Google Maps Section -->
@@ -288,6 +349,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 .contact-link {
     color: #333 !important; /* Force black color for links */
     text-decoration: none;
+}
+
+.form-unavailable {
+    color: #333333;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 16px;
+    margin-bottom: 20px;
 }
 
 .contact-link:hover {

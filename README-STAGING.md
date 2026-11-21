@@ -31,6 +31,16 @@ The supplied export defines 13 tables including users, permissions, activity log
 - Contact and career form success/failure paths, email delivery, private resume storage/download policy.
 - About, nested news/career URLs, invalid IDs and pagination.
 
+## Public site maintenance and news
+
+The public front controller reads a flag file before it renders a page. The default path is `ahmad-private/public-site-maintenance` beside the document root, the same private directory as `config.php`. Set `AHMAD_MAINTENANCE_FILE` when the file lives somewhere else. A file whose contents are `1` makes every public page return HTTP 503 with the company name and a short maintenance message. Any other value, or a missing file, leaves the site visible. The admin scripts are separate entry points and do not read this flag.
+
+The same directory holds `public-site-contact-form` and `public-site-recaptcha`. A missing contact-form file, or any value other than `0`, leaves the form available. `0` hides the form, shows the phone, email, and office address, and refuses a posted submission. reCAPTCHA stays off unless its file is `1`. The checkbox is Google reCAPTCHA v2. The site key and secret are read from `AHMAD_RECAPTCHA_SITE_KEY` and `AHMAD_RECAPTCHA_SECRET_KEY`, or from `public-site-recaptcha-keys` in that private directory. If the switch is on and both keys are missing, a submission is refused and nothing is stored. A failed check says to complete the verification and stores nothing. Mail delivery is still the host `mail()` transport and is not confirmed.
+
+`deploy/upgrade-news-published.sql` adds `news.is_published` with default 1, so articles already on the site stay published. Import it once. Importing it again does not add the column a second time and does not change a later unpublished article. Until that column exists, the public pages show every article.
+
+This candidate is not deployed to ahmad.com.bd from this change. Take a full backup and get the owner's approval before replacing the live site.
+
 ## Still pending — not a full security sign-off
 Login rate limiting, comprehensive output escaping/rich-text sanitization, SMTP integration, durable private resume downloads, CSP policy, security audit of every authorization/data path, database migration checks, and full browser/runtime QA.
 

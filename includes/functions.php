@@ -78,6 +78,40 @@ function sanitize($input) {
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
 
+function publicAsset(string $path): string
+{
+    return '/' . ltrim($path, '/');
+}
+
+function newsHasPublishedFlag(PDO $conn): bool
+{
+    static $known = null;
+
+    if ($known !== null) {
+        return $known;
+    }
+
+    try {
+        $column = $conn->query("SHOW COLUMNS FROM news LIKE 'is_published'");
+        $known = $column !== false && $column->fetch() !== false;
+    } catch (PDOException $e) {
+        $known = false;
+    }
+
+    return $known;
+}
+
+function publishedNewsSql(PDO $conn, string $alias = ''): string
+{
+    if (!newsHasPublishedFlag($conn)) {
+        return '';
+    }
+
+    $column = $alias === '' ? 'is_published' : $alias . '.is_published';
+
+    return ' AND ' . $column . ' = 1';
+}
+
 
 /**
  * Get team members
