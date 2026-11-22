@@ -28,7 +28,7 @@ if (!contentTableExists($conn, 'achievements')) {
     $action = 'missing';
 }
 
-if ($action === 'delete' && $id > 0) {
+if ($action === 'delete' && $id > 0 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare('SELECT photo FROM achievements WHERE id = ?');
     $stmt->execute([$id]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -46,7 +46,7 @@ if ($action === 'delete' && $id > 0) {
     $action = 'list';
 }
 
-if ($action === 'toggle' && $id > 0) {
+if ($action === 'toggle' && $id > 0 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->prepare('UPDATE achievements SET is_active = NOT is_active WHERE id = ?')->execute([$id]);
     $message = 'Status updated.';
     $messageType = 'success';
@@ -264,8 +264,14 @@ include 'includes/header.php';
                                         <td><?php echo (int) $achievement['is_active'] === 1 ? 'Active' : 'Inactive'; ?></td>
                                         <td class="action-buttons">
                                             <a href="?action=edit&id=<?php echo (int) $achievement['id']; ?>" title="Edit"><i class="fas fa-edit" style="color:#007bff;"></i></a>
-                                            <a href="?action=toggle&id=<?php echo (int) $achievement['id']; ?>" title="<?php echo (int) $achievement['is_active'] === 1 ? 'Deactivate' : 'Activate'; ?>"><i class="fas <?php echo (int) $achievement['is_active'] === 1 ? 'fa-toggle-on' : 'fa-toggle-off'; ?>" style="color:<?php echo (int) $achievement['is_active'] === 1 ? '#28a745' : '#6c757d'; ?>;"></i></a>
-                                            <a href="?action=delete&id=<?php echo (int) $achievement['id']; ?>" title="Delete"><i class="fas fa-trash-alt" style="color:#dc3545;"></i></a>
+                                            <form method="post" action="?action=toggle&id=<?php echo (int) $achievement['id']; ?>" style="display:inline;margin-right:10px">
+                                                <input type="hidden" name="_confirm_action" value="1">
+                                                <button type="submit" title="<?php echo (int) $achievement['is_active'] === 1 ? 'Deactivate' : 'Activate'; ?>" style="background:none;border:0;padding:0;cursor:pointer;"><i class="fas <?php echo (int) $achievement['is_active'] === 1 ? 'fa-toggle-on' : 'fa-toggle-off'; ?>" style="color:<?php echo (int) $achievement['is_active'] === 1 ? '#28a745' : '#6c757d'; ?>;"></i></button>
+                                            </form>
+                                            <form method="post" action="?action=delete&id=<?php echo (int) $achievement['id']; ?>" style="display:inline;margin-right:10px" onsubmit="return confirm('Are you sure you want to delete this achievement?');">
+                                                <input type="hidden" name="_confirm_action" value="1">
+                                                <button type="submit" title="Delete" style="background:none;border:0;padding:0;cursor:pointer;"><i class="fas fa-trash-alt" style="color:#dc3545;"></i></button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
