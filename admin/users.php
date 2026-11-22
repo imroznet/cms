@@ -26,7 +26,7 @@ $message = '';
 $messageType = '';
 
 // Delete user
-if ($action === 'delete' && $id > 0) {
+if ($action === 'delete' && $id > 0 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Prevent self-deletion
     if ($id === $_SESSION['user_id']) {
         $message = "You cannot delete your own account";
@@ -343,9 +343,12 @@ include 'includes/header.php';
                                             </a>
                                             
                                             <?php if ($user['id'] !== $_SESSION['user_id']): ?>
-                                                <a href="?action=delete&id=<?php echo $user['id']; ?>" onclick="return confirm('Are you sure you want to delete this user?');" title="Delete">
-                                                    <i class="fas fa-trash-alt" style="color: #dc3545;"></i>
-                                                </a>
+                                                <form method="post" action="?action=delete&id=<?php echo $user['id']; ?>" style="display:inline;margin-right:10px" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                                    <input type="hidden" name="_confirm_action" value="1">
+                                                    <button type="submit" title="Delete" style="background:none;border:0;padding:0;cursor:pointer;">
+                                                        <i class="fas fa-trash-alt" style="color: #dc3545;"></i>
+                                                    </button>
+                                                </form>
                                             <?php endif; ?>
                                         </td>
                                     </tr>
