@@ -25,6 +25,8 @@ if (!defined('INCLUDED')) {
                 
                 <?php if (in_array('manage_settings', $_SESSION['permissions'])): ?>
                 <li><a href="settings.php" <?php echo $currentPage === 'settings' ? 'class="active"' : ''; ?>><i class="fas fa-cog"></i> Site Settings</a></li>
+                <li><a href="documents.php" <?php echo $currentPage === 'documents' ? 'class="active"' : ''; ?>><i class="fas fa-file-alt"></i> Documents</a></li>
+                <li><a href="achievements.php" <?php echo $currentPage === 'achievements' ? 'class="active"' : ''; ?>><i class="fas fa-trophy"></i> Achievements</a></li>
                 <li><a href="social.php" <?php echo $currentPage === 'social' ? 'class="active"' : ''; ?>><i class="fas fa-share-alt"></i> Social Links</a></li>
                 <li><a href="images.php" <?php echo $currentPage === 'images' ? 'class="active"' : ''; ?>><i class="fas fa-images"></i> Image Management</a></li>
                 <?php endif; ?>

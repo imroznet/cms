@@ -43,7 +43,7 @@ if ($action === 'view' && $id > 0) {
 }
 
 // Delete message
-if ($action === 'delete' && $id > 0) {
+if ($action === 'delete' && $id > 0 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare("DELETE FROM contact_messages WHERE id = ?");
     $result = $stmt->execute([$id]);
     
@@ -122,7 +122,10 @@ include 'includes/header.php';
                     <div class="message-actions" style="margin-top: 20px; display: flex; gap: 10px;">
                         <a href="?action=list" class="btn btn-secondary">Back to List</a>
                         <a href="mailto:<?php echo htmlspecialchars($contactMessage['email']); ?>?subject=Re: <?php echo htmlspecialchars($contactMessage['subject']); ?>" class="btn btn-primary">Reply via Email</a>
-                        <a href="?action=delete&id=<?php echo $contactMessage['id']; ?>" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this message?');">Delete Message</a>
+                        <form method="post" action="?action=delete&id=<?php echo $contactMessage['id']; ?>" style="display:inline" onsubmit="return confirm('Are you sure you want to delete this message?');">
+                            <input type="hidden" name="_confirm_action" value="1">
+                            <button type="submit" class="btn btn-danger">Delete Message</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -160,9 +163,12 @@ include 'includes/header.php';
                                             <a href="?action=view&id=<?php echo $msg['id']; ?>" title="View">
                                                 <i class="fas fa-eye" style="color: #007bff;"></i>
                                             </a>
-                                            <a href="?action=delete&id=<?php echo $msg['id']; ?>" onclick="return confirm('Are you sure you want to delete this message?');" title="Delete">
-                                                <i class="fas fa-trash-alt" style="color: #dc3545;"></i>
-                                            </a>
+                                            <form method="post" action="?action=delete&id=<?php echo $msg['id']; ?>" style="display:inline;margin-right:10px" onsubmit="return confirm('Are you sure you want to delete this message?');">
+                                                <input type="hidden" name="_confirm_action" value="1">
+                                                <button type="submit" title="Delete" style="background:none;border:0;padding:0;cursor:pointer;">
+                                                    <i class="fas fa-trash-alt" style="color: #dc3545;"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

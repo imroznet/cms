@@ -101,6 +101,206 @@ function newsHasPublishedFlag(PDO $conn): bool
     return $known;
 }
 
+function siteHasColumn(PDO $conn, string $column): bool
+{
+    static $columns = null;
+
+    if (!preg_match('/^[a-z_]+$/', $column)) {
+        return false;
+    }
+
+    if ($columns === null) {
+        $columns = [];
+
+        try {
+            foreach ($conn->query('SHOW COLUMNS FROM site_settings') as $row) {
+                if (isset($row['Field']) && is_string($row['Field'])) {
+                    $columns[$row['Field']] = true;
+                }
+            }
+        } catch (PDOException $e) {
+            $columns = [];
+        }
+    }
+
+    return isset($columns[$column]);
+}
+
+/**
+ * Registered and corporate offices, or the older single address when neither is set.
+ *
+ * @param array<string, mixed> $settings
+ * @return list<array{label: string, text: string}>
+ */
+function officeAddressBlocks(array $settings): array
+{
+    $registered = trim((string) ($settings['registered_office_address'] ?? ''));
+    $corporate = trim((string) ($settings['corporate_office_address'] ?? ''));
+
+    if ($registered !== '' || $corporate !== '') {
+        $blocks = [];
+
+        if ($registered !== '') {
+            $blocks[] = ['label' => 'Registered Office:', 'text' => $registered];
+        }
+
+        if ($corporate !== '') {
+            $blocks[] = ['label' => 'Corporate Office:', 'text' => $corporate];
+        }
+
+        return $blocks;
+    }
+
+    $fallback = trim((string) ($settings['address'] ?? ''));
+
+    if ($fallback === '') {
+        return [];
+    }
+
+    return [['label' => '', 'text' => $fallback]];
+}
+
+function storedUploadName(mixed $name): ?string
+{
+    if (!is_string($name) || !preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{0,180}$/', $name) || str_contains($name, '..')) {
+        return null;
+    }
+
+    return $name;
+}
+
+function removeStoredFile(string $directory, mixed $name): void
+{
+    $safe = storedUploadName($name);
+    $root = realpath($directory);
+
+    if ($safe === null || $root === false) {
+        return;
+    }
+
+    $path = $root . DIRECTORY_SEPARATOR . $safe;
+    $real = realpath($path);
+
+    if ($real === false || !is_file($real) || !str_starts_with($real, $root . DIRECTORY_SEPARATOR)) {
+        return;
+    }
+
+    unlink($real);
+}
+
+function contentTableExists(PDO $conn, string $table): bool
+{
+    if (!in_array($table, ['company_documents', 'achievements'], true)) {
+        return false;
+    }
+
+    try {
+        $stmt = $conn->query('SHOW TABLES LIKE ' . $conn->quote($table));
+
+        return $stmt !== false && $stmt->fetch() !== false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+function documentTypeLabel(string $type): string
+{
+    return match ($type) {
+        'incorporation' => 'Incorporation',
+        'trade_license' => 'Trade License',
+        'bin' => 'BIN',
+        'tin' => 'TIN',
+        default => 'Other',
+    };
+}
+
+function formatStoredDate(mixed $value): string
+{
+    if (!is_string($value) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) || $value === '0000-00-00') {
+        return '';
+    }
+
+    $time = strtotime($value);
+
+    return $time === false ? '' : date('j F Y', $time);
+}
+
+/**
+ * @return list<array<string, mixed>>
+ */
+function getCompanyDocuments(PDO $conn, bool $activeOnly = true): array
+{
+    if (!contentTableExists($conn, 'company_documents')) {
+        return [];
+    }
+
+    try {
+        $sql = 'SELECT * FROM company_documents';
+        if ($activeOnly) {
+            $sql .= ' WHERE is_active = 1';
+        }
+        $sql .= ' ORDER BY display_order ASC, id ASC';
+        $rows = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+        return is_array($rows) ? $rows : [];
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
+ * @return list<array<string, mixed>>
+ */
+function getAchievements(PDO $conn, bool $activeOnly = true): array
+{
+    if (!contentTableExists($conn, 'achievements')) {
+        return [];
+    }
+
+    try {
+        $sql = 'SELECT * FROM achievements';
+        if ($activeOnly) {
+            $sql .= ' WHERE is_active = 1';
+        }
+        $sql .= ' ORDER BY display_order ASC, id ASC';
+        $rows = $conn->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+        return is_array($rows) ? $rows : [];
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+function moveDisplayOrder(PDO $conn, string $table, int $id, string $direction): void
+{
+    if (!in_array($table, ['company_documents', 'achievements'], true) || $id < 1 || !in_array($direction, ['up', 'down'], true)) {
+        return;
+    }
+
+    $rows = $conn->query('SELECT id FROM ' . $table . ' ORDER BY display_order ASC, id ASC')->fetchAll(PDO::FETCH_COLUMN);
+    $ids = array_map(static fn (mixed $rowId): int => (int) $rowId, is_array($rows) ? $rows : []);
+    $index = array_search($id, $ids, true);
+
+    if ($index === false) {
+        return;
+    }
+
+    $swap = $direction === 'up' ? $index - 1 : $index + 1;
+
+    if (!isset($ids[$swap])) {
+        return;
+    }
+
+    $current = $ids[$index];
+    $ids[$index] = $ids[$swap];
+    $ids[$swap] = $current;
+    $stmt = $conn->prepare('UPDATE ' . $table . ' SET display_order = ? WHERE id = ?');
+
+    foreach ($ids as $position => $rowId) {
+        $stmt->execute([$position + 1, $rowId]);
+    }
+}
+
 function publishedNewsSql(PDO $conn, string $alias = ''): string
 {
     if (!newsHasPublishedFlag($conn)) {

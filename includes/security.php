@@ -25,12 +25,6 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 if ($method === 'POST' && (!is_string($_POST['csrf'] ?? null) || !hash_equals($_SESSION['csrf'], $_POST['csrf']))) {
     security_stop(403, 'Your form expired. Reload the page and try again.');
 }
-// Until legacy action links are replaced, GET displays a confirmation only.
-$is_admin = str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/admin/');
-$mutation = $is_admin && (in_array($_GET['action'] ?? '', ['delete','toggle'], true) || basename($_SERVER['SCRIPT_NAME'] ?? '') === 'logout.php');
-if ($mutation && $method !== 'POST') {
-    echo '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Confirm action</title><body><main style="max-width:32rem;margin:10vh auto;font:18px system-ui;padding:24px"><h1>Confirm this action</h1><p>This will change your website data.</p><form method="post">' . csrf_field() . '<input type="hidden" name="_confirm_action" value="1"><button type="submit">Confirm</button></form><p><a href="dashboard.php">Cancel</a></p></main></body></html>'; exit;
-}
 // Validate every upload before legacy handlers use it. No client MIME trust.
 foreach ($_FILES as &$file) {
     if (is_array($file['name'] ?? null)) { security_stop(400, 'Multiple files are not supported.'); }

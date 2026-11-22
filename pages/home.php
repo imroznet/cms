@@ -100,6 +100,35 @@ if (count($statistics) > 0):
 <?php endif; ?>
 
 <?php
+$achievementSlides = array_values(array_filter(getAchievements($conn, true), static function (array $achievement): bool {
+    return storedUploadName($achievement['photo'] ?? null) !== null;
+}));
+if (count($achievementSlides) > 0):
+?>
+<!-- Achievements Section -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Achievements</h2>
+        </div>
+        <div class="achievements-slider" data-achievements-slider>
+            <?php foreach ($achievementSlides as $index => $achievement): ?>
+                <div class="achievement-slide<?php echo $index === 0 ? ' active' : ''; ?>">
+                    <img src="<?php echo htmlspecialchars(publicAsset('assets/images/uploads/' . $achievement['photo'])); ?>" alt="<?php echo htmlspecialchars((string) ($achievement['title'] ?? '')); ?>">
+                    <h3><?php echo htmlspecialchars((string) ($achievement['title'] ?? '')); ?></h3>
+                    <?php if (trim((string) ($achievement['year'] ?? '')) !== ''): ?>
+                        <p class="achievement-year"><?php echo (int) $achievement['year']; ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+            <button type="button" class="achievement-slider-prev" data-achievements-prev aria-label="Previous achievement">&#8249;</button>
+            <button type="button" class="achievement-slider-next" data-achievements-next aria-label="Next achievement">&#8250;</button>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php
 $latestNews = [];
 try {
     $newsSql = "SELECT * FROM news WHERE 1 = 1" . publishedNewsSql($conn) . " ORDER BY publish_date DESC, id DESC LIMIT 3";
@@ -268,6 +297,66 @@ if (count($latestNews) > 0):
     margin: 0 auto 30px;
 }
 
+/* Achievements slider */
+.achievements-slider {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.achievement-slide {
+    display: none;
+    text-align: center;
+    background: #fff;
+    padding-bottom: 20px;
+}
+
+.achievement-slide.active {
+    display: block;
+}
+
+.achievement-slide img {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+}
+
+.achievement-slide h3 {
+    margin: 20px 20px 5px;
+}
+
+.achievement-year {
+    color: #007bff;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.achievements-slider button {
+    position: absolute;
+    top: 210px;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.achievement-slider-prev {
+    left: 15px;
+}
+
+.achievement-slider-next {
+    right: 15px;
+}
+
 /* Responsive */
 @media screen and (max-width: 768px) {
     .hero h1 {
@@ -382,5 +471,45 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     setupObserver();
+
+    // Achievements photo slider: auto-rotates, with prev/next controls.
+    const achievementsSlider = document.querySelector('[data-achievements-slider]');
+    if (achievementsSlider) {
+        const slides = achievementsSlider.querySelectorAll('.achievement-slide');
+        const prevButton = achievementsSlider.querySelector('[data-achievements-prev]');
+        const nextButton = achievementsSlider.querySelector('[data-achievements-next]');
+        let currentSlide = 0;
+        let sliderTimer = null;
+
+        const showSlide = (index) => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (index + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+        };
+
+        const startSlider = () => {
+            if (slides.length > 1) {
+                sliderTimer = setInterval(() => showSlide(currentSlide + 1), 5000);
+            }
+        };
+
+        const stopSlider = () => {
+            if (sliderTimer !== null) {
+                clearInterval(sliderTimer);
+                sliderTimer = null;
+            }
+        };
+
+        if (slides.length < 2) {
+            if (prevButton) { prevButton.style.display = 'none'; }
+            if (nextButton) { nextButton.style.display = 'none'; }
+        } else {
+            if (prevButton) { prevButton.addEventListener('click', () => { stopSlider(); showSlide(currentSlide - 1); startSlider(); }); }
+            if (nextButton) { nextButton.addEventListener('click', () => { stopSlider(); showSlide(currentSlide + 1); startSlider(); }); }
+            achievementsSlider.addEventListener('mouseenter', stopSlider);
+            achievementsSlider.addEventListener('mouseleave', startSlider);
+            startSlider();
+        }
+    }
 });
 </script>

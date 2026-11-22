@@ -39,6 +39,12 @@ The same directory holds `public-site-contact-form` and `public-site-recaptcha`.
 
 `deploy/upgrade-news-published.sql` adds `news.is_published` with default 1, so articles already on the site stay published. Import it once. Importing it again does not add the column a second time and does not change a later unpublished article. Until that column exists, the public pages show every article.
 
+`deploy/upgrade-company-addresses.sql` adds `registered_office_address` and `corporate_office_address` to the settings row. Both start empty. The footer and contact page show a labelled office only after it is entered in Site Settings, Contact Info. The older single address remains the fallback when both offices are blank. Importing the file again does not add the columns a second time and does not replace an address already stored.
+
+`deploy/upgrade-company-documents.sql` creates `company_documents` and inserts no rows. Import it once. Admin → Documents (same sign-in as Site Settings) adds, edits, activates, reorders, and deletes certificates. Certificates are PDF, JPG, or PNG files under `assets/documents/`. Active documents appear in full on the About page and at `/documents`. The homepage does not list them. Until the table exists, those sections stay empty.
+
+`deploy/upgrade-achievements.sql` creates `achievements` and inserts no rows. Import it once. Admin → Achievements (same sign-in as Site Settings) adds, edits, activates, reorders, and deletes achievements with an optional JPG or PNG photo under `assets/images/uploads/`. Active achievements appear in full on the About page. The homepage shows only a photo slider of achievements that have a photo, and renders nothing until at least one active achievement has a photo. Until the table exists, those sections stay empty.
+
 This candidate is not deployed to ahmad.com.bd from this change. Take a full backup and get the owner's approval before replacing the live site.
 
 ## Still pending — not a full security sign-off

@@ -24,7 +24,7 @@ $message = '';
 $messageType = '';
 
 // Handle statistic deletion
-if ($action === 'delete' && isset($_GET['id'])) {
+if ($action === 'delete' && isset($_GET['id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int)$_GET['id'];
     
     try {
@@ -302,9 +302,12 @@ include 'includes/header.php';
                                             <a href="?action=edit&id=<?php echo $stat['id']; ?>" title="Edit">
                                                 <i class="fas fa-edit" style="color: #007bff;"></i>
                                             </a>
-                                            <a href="?action=delete&id=<?php echo $stat['id']; ?>" onclick="return confirm('Are you sure you want to delete this statistic?');" title="Delete">
-                                                <i class="fas fa-trash-alt" style="color: #dc3545;"></i>
-                                            </a>
+                                            <form method="post" action="?action=delete&id=<?php echo $stat['id']; ?>" style="display:inline;margin-right:10px" onsubmit="return confirm('Are you sure you want to delete this statistic?');">
+                                                <input type="hidden" name="_confirm_action" value="1">
+                                                <button type="submit" title="Delete" style="background:none;border:0;padding:0;cursor:pointer;">
+                                                    <i class="fas fa-trash-alt" style="color: #dc3545;"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
